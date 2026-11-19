@@ -44,13 +44,13 @@ flowchart LR
 
 ## Decisões de implementação
 
-- **Apresentação**: manter o cliente HTTP compartilhado e componentes de rota existentes; cada tela consome apenas seu endpoint e apresenta estados acessíveis de carregamento, vazio e erro junto aos dados retornados. Não duplicar regras da API na interface.
-- **Lógica**: manter as rotas como adaptadores HTTP finos e concentrar validação e regras no `octofitService.ts`. Entradas inválidas ou referências inexistentes devem produzir respostas 4xx controladas, nunca erros 500 de conversão ou respostas 501 de funcionalidade pendente.
-- **Dados**: completar validações e valores padrão nos modelos Mongoose sem mudar a estrutura do seed que já passou no teste de idempotência. Seed e operações da aplicação continuam sendo os únicos caminhos para estruturar e popular o banco.
-- **Atividades**: validar formato e existência de pessoa/equipe antes de persistir; guardar as referências, tipo e minutos recebidos e calcular pontos e data no serviço. Listagem e criação devem serializar referências como IDs no contrato HTTP.
-- **Equipes**: validar o nome, preservar nome e mascote recebidos e manter os integrantes informados como referências de usuários; listagem e criação devem retornar esses integrantes de forma estável.
-- **Placar**: agregar os pontos das atividades por equipe, ordenar do maior total para o menor e atribuir posições começando em 1 após a ordenação.
-- **Sugestões de treino**: localizar a pessoa pelo e-mail, usar a meta e as atividades recentes para ordenar sugestões compatíveis e explicar a escolha em `reason`; e-mail desconhecido recebe resposta 4xx.
+- Decisão da camada de apresentação: manter o cliente HTTP compartilhado e as rotas React existentes; cada tela consome seu endpoint e exibe estados acessíveis de carregamento, vazio e erro sem duplicar regras da API.
+- Decisão da camada de lógica: manter as rotas como adaptadores HTTP e concentrar validação e regras no serviço; entradas inválidas devem retornar 4xx controlados, não 500 nem 501.
+- Decisão da camada de dados: definir campos obrigatórios e valores padrão nos modelos Mongoose, preservando o seed idempotente que já passou nos testes e sem apagar dados não relacionados.
+- Abordagem para registro de atividades: validar IDs e existência de pessoa/equipe antes de salvar as referências e os valores enviados; calcular pontos e data no serviço e retorná-los no contrato.
+- Abordagem para gerenciamento de equipes: rejeitar equipe sem nome, preservar nome e mascote e manter os integrantes enviados como referências listáveis de usuários.
+- Abordagem para o placar: somar os pontos das atividades por equipe, ordenar os totais em ordem decrescente e atribuir posições iniciadas em 1.
+- Abordagem para sugestões de treino: localizar a pessoa pelo e-mail, priorizar treinos compatíveis com sua meta e atividade recente, explicar a recomendação e retornar 4xx quando não for encontrada.
 
 ## Baseline dos testes
 
